@@ -7,9 +7,9 @@ public abstract class XMLHandler {
 	protected Document document;
 	protected Element racine;
 	
-	public XMLHandler() {
-		document = new Document();
-		racine = new Element("produits");
-		document.setRootElement(racine);
+	public XMLHandler(String racine) {
+		this.document = new Document();
+		this.racine = new Element(racine);
+		this.document.setRootElement(this.racine);
 	}
 }
