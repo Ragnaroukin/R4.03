@@ -1,10 +1,15 @@
 package miniprojet;
 
+import miniprojet.jdom.AfficherProduits;
+
 public class Main {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		AfficherProduits afficheur = new AfficherProduits();
+		
+		afficheur.ajouterProduit("Clavier","10","200");
+		
+		afficheur.afficher();
 	}
 
 }
