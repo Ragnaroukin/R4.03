@@ -1,5 +1,7 @@
 package miniprojet.jdom;
 
+import java.sql.ResultSet;
+
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -16,12 +18,13 @@ public class AfficherProduits extends XMLHandler {
 	 * @param prix le prix du produit
 	 * @param quantite la quantité du produit
 	 */
-	public void ajouterProduit(String nom, String prix, String quantite) {
-		Element produit = new Element("produit");
-		Element elementNom = new Element("nom").addContent(nom);
-		Element elementPrix = new Element("prix").addContent(prix);
-		Element elementQuantite = new Element("quantité").addContent(quantite);
-		produit.addContent(elementNom).addContent(elementPrix).addContent(elementQuantite);
+	public void ajouterProduit(int id) {
+		ResultSet res = jdbc.selectProduit(id);
+		Element produit= new Element("produit");
+		Element nom = new Element("nom").addContent(res.getString("nom"));
+		Element prix = new Element("prix").addContent(res.getString("prix"));
+		Element quantite = new Element("quantité").addContent(res.getString("quantite"));
+		produit.addContent(nom).addContent(prix).addContent(quantite);
 		racine.addContent(produit);
 	}
 	
