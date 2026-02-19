@@ -29,7 +29,6 @@ public class JDBC {
 					.getConnection(JDBC.getInstance().getUrl(), 
 							JDBC.getInstance().getUser(),
 							JDBC.getInstance().getPassword());
-			System.out.println("Connexion réussie !");
 			return conn;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -71,7 +70,6 @@ public class JDBC {
 	// Verify methods
 	public boolean clientExists() {
 		return false;
-
 	}
 
 	public boolean productExists() {
@@ -185,7 +183,7 @@ public class JDBC {
 			e.printStackTrace();
 		}
 		
-		String sql = "INSERT INTO LIGNE_COMMAND(commande_id, id_produit, quantite, prix_vendu) VALUES (?,?,?,?)";
+		String sql = "INSERT INTO LIGNE_COMMANDE(commande_id, id_produit, quantite, prix_vendu) VALUES (?,?,?,?)";
 		
 		try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -207,34 +205,111 @@ public class JDBC {
 	
 	// Select methods
 	public ResultSet selectClients() {
-		return null;
+	    String sql = "SELECT * FROM CLIENTS";
+
+	    try {
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        return ps.executeQuery();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return null;
+	    }
 	}
+
 	
 	public ResultSet selectProducts() {
-		return null;
+	    String sql = "SELECT * FROM PRODUITS";
+
+	    try {
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        return ps.executeQuery();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return null;
+	    }
 	}
+
 
 	public ResultSet selectCommands() {
-		return null;
+	    String sql = "SELECT * FROM COMMANDES";
+
+	    try {
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        return ps.executeQuery();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return null;
+	    }
 	}
 
-	public ResultSet selectLines() {
-		return null;
+
+	public ResultSet selectLines(int command) {
+	    String sql = "SELECT * FROM LIGNE_COMMANDE WHERE commande_id = ?";
+
+	    try {
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        ps.setInt(1, command);
+	        return ps.executeQuery();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return null;
+	    }
 	}
 
-	public ResultSet selectClient(int id) {
-		return null;
+
+	public ResultSet selectClient(String email) {
+	    String sql = "SELECT * FROM CLIENTS WHERE email = ?";
+
+	    try {
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        ps.setString(1, email);
+	        return ps.executeQuery();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return null;
+	    }
 	}
+
 	
 	public ResultSet selectProduct(int id) {
-		return null;
+	    String sql = "SELECT * FROM PRODUITS WHERE id = ?";
+
+	    try {
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        ps.setInt(1, id);
+	        return ps.executeQuery();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return null;
+	    }
 	}
+
 
 	public ResultSet selectCommand(int id) {
-		return null;
+	    String sql = "SELECT * FROM COMMANDES WHERE id = ?";
+
+	    try {
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        ps.setInt(1, id);
+	        return ps.executeQuery();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return null;
+	    }
 	}
 
+
 	public ResultSet selectLine(int id) {
-		return null;
+	    String sql = "SELECT * FROM LIGNE_COMMANDE WHERE id = ?";
+
+	    try {
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        ps.setInt(1, id);
+	        return ps.executeQuery();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return null;
+	    }
 	}
+
 }
