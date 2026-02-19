@@ -1,6 +1,12 @@
 package miniprojet.jdbc;
 
 import java.sql.*;
+import java.util.ArrayList;
+
+import miniprojet.model.CommandLine;
+import miniprojet.model.Product;
+import miniprojet.model.Client;
+import miniprojet.model.Command;
 
 public class JDBC {
 	private String host;
@@ -25,10 +31,8 @@ public class JDBC {
 
 	private Connection connexion() {
 		try {
-			Connection conn = DriverManager
-					.getConnection(JDBC.getInstance().getUrl(), 
-							JDBC.getInstance().getUser(),
-							JDBC.getInstance().getPassword());
+			Connection conn = DriverManager.getConnection(JDBC.getInstance().getUrl(), JDBC.getInstance().getUser(),
+					JDBC.getInstance().getPassword());
 			return conn;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -75,7 +79,7 @@ public class JDBC {
 	public boolean productExists() {
 		return false;
 	}
-	
+
 	private boolean commandExists() {
 		return false;
 	}
@@ -103,7 +107,7 @@ public class JDBC {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void insertClient(String email, String nom, String ville) {
 		if (email.length() > 60 || nom.length() > 30 || ville.length() > 30)
 			return;
@@ -149,10 +153,9 @@ public class JDBC {
 	public void insertCommand(String email) {
 		if (email.length() > 60)
 			return;
-		
+
 		if (!clientExists())
 			insertClient(email);
-			
 
 		String sql = "INSERT INTO COMMANDES(email_client) VALUES (?)";
 
@@ -169,22 +172,16 @@ public class JDBC {
 	public void insertLine(int command, int product, int quantity) {
 		if (!commandExists() || !productExists())
 			return;
-		
+
 		if (!verifyQuantity(product, quantity))
 			return;
-		
+
 		modifyQuantity(product, -quantity);
-		
-		double price = 0;
-				
-		try {
-			price = selectProduct(product).getDouble("prix");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
+
+		double price = selectProduct(product).getPrix();
+
 		String sql = "INSERT INTO LIGNE_COMMANDE(commande_id, id_produit, quantite, prix_vendu) VALUES (?,?,?,?)";
-		
+
 		try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
 			ps.setInt(1, command);
@@ -202,114 +199,193 @@ public class JDBC {
 	public void modifyQuantity(int idProduct, int ajustement) {
 
 	}
-	
+
 	// Select methods
-	public ResultSet selectClients() {
-	    String sql = "SELECT * FROM CLIENTS";
+	public ArrayList<Client> selectClients() {
+		String sql = "SELECT * FROM CLIENTS";
+		ResultSet res;
+		ArrayList<Client> list = new ArrayList<Client>();
 
-	    try {
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        return ps.executeQuery();
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return null;
-	    }
+		try {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			res = ps.executeQuery();
+			
+			while (res.next()) {
+				String email = res.getString("email");
+				String nom = res.getString("nom");
+			    String ville = res.getString("ville");
+			    
+			    list.add(new Client(email, nom, ville));
+			}
+			
+			return list;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
-	
-	public ResultSet selectProducts() {
-	    String sql = "SELECT * FROM PRODUITS";
+	public ArrayList<Product> selectProducts() {
+		String sql = "SELECT * FROM PRODUITS";
+		ResultSet res;
+		ArrayList<Product> list = new ArrayList<Product>();
 
-	    try {
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        return ps.executeQuery();
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return null;
-	    }
+		try {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			res = ps.executeQuery();
+			
+			while (res.next()) {
+				int id = res.getInt("id");
+				String nom = res.getString("nom");
+			    double prix = res.getDouble("prix");
+			    int quantite = res.getInt("quantite");
+			    
+			    list.add(new Product(id, nom, prix, quantite));
+			}
+			
+			return list;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
+	public ArrayList<Command> selectCommands() {
+		String sql = "SELECT * FROM COMMANDES";
+		ResultSet res;
+		ArrayList<Command> list = new ArrayList<Command>();
 
-	public ResultSet selectCommands() {
-	    String sql = "SELECT * FROM COMMANDES";
-
-	    try {
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        return ps.executeQuery();
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return null;
-	    }
+		try {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			res = ps.executeQuery();
+			
+			while (res.next()) {
+				int id = res.getInt("id");
+				String emailClient = res.getString("email_client");
+			    Date date = res.getDate("date");
+			    
+			    list.add(new Command(id, emailClient, date));
+			}
+			
+			return list;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
+	public ArrayList<CommandLine> selectLines(int command) {
+		String sql = "SELECT * FROM LIGNE_COMMANDE WHERE commande_id = ?";
+		ResultSet res;
+		ArrayList<CommandLine> list = new ArrayList<CommandLine>();
 
-	public ResultSet selectLines(int command) {
-	    String sql = "SELECT * FROM LIGNE_COMMANDE WHERE commande_id = ?";
+		try {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, command);
+			res = ps.executeQuery();
+			
+			while (res.next()) {
+				int id = res.getInt("id");
+				int commandeId = res.getInt("commande_id");
+				int produitId = res.getInt("id_produit");
+				int quantite = res.getInt("quantite");
+				double prixVendu = res.getDouble("prix");
 
-	    try {
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        ps.setInt(1, command);
-	        return ps.executeQuery();
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return null;
-	    }
+				list.add(new CommandLine(id, commandeId, produitId, quantite, prixVendu));
+			}
+			
+			return list;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
+	public Client selectClient(String email) {
+		String sql = "SELECT * FROM CLIENTS WHERE email = ?";
+		ResultSet res;
 
-	public ResultSet selectClient(String email) {
-	    String sql = "SELECT * FROM CLIENTS WHERE email = ?";
+		try {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, email);
+			res = ps.executeQuery();
 
-	    try {
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        ps.setString(1, email);
-	        return ps.executeQuery();
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return null;
-	    }
+			res.next();
+
+			String nom = res.getString("nom");
+		    String ville = res.getString("ville");
+		    
+		    return new Client(email, nom, ville);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
-	
-	public ResultSet selectProduct(int id) {
-	    String sql = "SELECT * FROM PRODUITS WHERE id = ?";
+	public Product selectProduct(int id) {
+		String sql = "SELECT * FROM PRODUITS WHERE id = ?";
+		ResultSet res;
 
-	    try {
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        ps.setInt(1, id);
-	        return ps.executeQuery();
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return null;
-	    }
+		try {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, id);
+			res = ps.executeQuery();
+
+			res.next();
+
+			String nom = res.getString("nom");
+		    double prix = res.getDouble("prix");
+		    int quantite = res.getInt("quantite");
+		    
+		    return new Product(id, nom, prix, quantite);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
+	public Command selectCommand(int id) {
+		String sql = "SELECT * FROM COMMANDES WHERE id = ?";
+		ResultSet res;
 
-	public ResultSet selectCommand(int id) {
-	    String sql = "SELECT * FROM COMMANDES WHERE id = ?";
+		try {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, id);
+			res = ps.executeQuery();
 
-	    try {
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        ps.setInt(1, id);
-	        return ps.executeQuery();
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return null;
-	    }
+			res.next();
+
+			String emailClient = res.getString("email_client");
+		    Date date = res.getDate("date");
+		    
+		    return new Command(id, emailClient, date);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
+	public CommandLine selectLine(int id) {
+		String sql = "SELECT * FROM LIGNE_COMMANDE WHERE id = ?";
+		ResultSet res;
 
-	public ResultSet selectLine(int id) {
-	    String sql = "SELECT * FROM LIGNE_COMMANDE WHERE id = ?";
+		try {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, id);
+			res = ps.executeQuery();
 
-	    try {
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        ps.setInt(1, id);
-	        return ps.executeQuery();
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return null;
-	    }
+			res.next();
+
+			int commandeId = res.getInt("commande_id");
+			int produitId = res.getInt("id_produit");
+			int quantite = res.getInt("quantite");
+			double prixVendu = res.getDouble("prix");
+
+			return new CommandLine(id, commandeId, produitId, quantite, prixVendu);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }
