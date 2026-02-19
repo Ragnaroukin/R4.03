@@ -1,6 +1,7 @@
 package miniprojet;
 
 import miniprojet.jdom.AfficherProduits;
+import miniprojet.jdom.ExporterCommandes;
 
 public class Main {
 
@@ -10,6 +11,12 @@ public class Main {
 		afficheur.ajouterProduit("Clavier","10","200");
 		
 		afficheur.afficher();
+		
+		ExporterCommandes export = new ExporterCommandes();
+		
+		export.ajouterCommande(1);
+		
+		export.exporter();
 	}
 
 }
