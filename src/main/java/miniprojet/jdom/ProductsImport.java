@@ -8,9 +8,9 @@ import org.jdom2.output.XMLOutputter;
 import java.io.File;
 import java.util.List;
 
-public class ProductsHandler extends XMLHandler{
+public class ProductsImport extends XMLHandler{
 	
-	public ProductsHandler() {
+	public ProductsImport() {
 		super();
 	}
 	
