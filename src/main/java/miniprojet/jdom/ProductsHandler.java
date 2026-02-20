@@ -1,10 +1,12 @@
 package miniprojet.jdom;
 
+import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import java.io.File;
+import java.util.List;
 
 public class ProductsHandler extends XMLHandler{
 	
@@ -23,6 +25,7 @@ public class ProductsHandler extends XMLHandler{
 	    
 	    try {
 	        document = builder.build(file);
+	        root = document.getRootElement();
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
@@ -32,7 +35,15 @@ public class ProductsHandler extends XMLHandler{
 	 * Ajouter les produits dans la base de données
 	 */
 	public void addProducts() {
+		List<Element> products = root.getChildren("produit");
 		
+		for (Element product : products) {
+            String name = product.getChildText("nom");
+            double price = Double.parseDouble(product.getChildText("prix"));
+            int quantity = Integer.parseInt(product.getChildText("quantité"));
+
+            jdbc.insertProduit(name, quantity, price);
+        }
 	}
 	
 	/**
