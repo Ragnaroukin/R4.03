@@ -2,6 +2,7 @@ package miniprojet.jdom;
 
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import org.jdom2.Document;
@@ -20,14 +21,21 @@ public class CommandsExport extends XMLHandler{
 	}
 	
 	/**
-	 * Exporter la commande
+	 * Exporter une commande
 	 * @param id l'identifiant de la commande
 	 */
-	public void exporterCommande(int id) {
+	private void exportCommand(int id) {
 		
 		Command command = jdbc.selectCommand(id);
 		
 		Element commandElement = new Element("commande");
+		Element dateElement = new Element("date");
+		Element totalElement = new Element("total");
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+		
+		dateElement.addContent(sdf.format(command.getDate()));
+		totalElement.addContent(""+getTotalCommand(id));
 		
 		exportClient(command, commandElement);
 		exportProducts(id, commandElement);
@@ -35,6 +43,19 @@ public class CommandsExport extends XMLHandler{
 		commandElement.setAttribute("id", "C"+id);
 		
 		root.addContent(commandElement);
+	}
+	
+	/**
+	 * Obtenir le total d'une commande
+	 * @param id l'identifiant de la commande
+	 * @return le total de la commande
+	 */
+	public int getTotalCommand(int id) {
+		ArrayList<CommandLine> lines = jdbc.selectLines(id);
+		int total = 0;
+		for(CommandLine line : lines)
+			total += line.getPrixVendu() * line.getQuantite();
+		return total;
 	}
 	
 	/**
@@ -52,7 +73,7 @@ public class CommandsExport extends XMLHandler{
 	}
 
 	/**
-	 * Exporte les d'une commande
+	 * Exporte les produits d'une commande
 	 * @param id l'id de la commande
 	 * @param parent l'élément qui représente la commande
 	 */
@@ -68,8 +89,8 @@ public class CommandsExport extends XMLHandler{
 			product = jdbc.selectProduct(line.getProduitId());
 			productElement = new Element("produit");
 			nameElement = new Element("nom").addContent(product.getNom());
-			priceElement = new Element("prix").addContent(""+product.getPrix());
-			quantityElement = new Element("quantité").addContent(""+product.getQuantite());
+			priceElement = new Element("prix").addContent(""+line.getPrixVendu());
+			quantityElement = new Element("quantité").addContent(""+line.getQuantite());
 			productElement.addContent(nameElement).addContent(priceElement).addContent(quantityElement);
 			parent.addContent(productElement);
 		}
@@ -78,7 +99,12 @@ public class CommandsExport extends XMLHandler{
 	/**
 	 * Exporter la liste des commandes au format XML
 	 */
-	public void export() {
+	public void exportCommands() {
+		
+		ArrayList<Command> commands = jdbc.selectCommands();
+		
+		commands.forEach(command -> exportCommand(command.getId()));
+		
 	    XMLOutputter output = new XMLOutputter(Format.getPrettyFormat());
 
 	    try (OutputStream out = new FileOutputStream("export_commandes.xml")) {
