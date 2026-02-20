@@ -12,27 +12,11 @@ import org.jdom2.output.XMLOutputter;
 import miniprojet.jdbc.JDBC;
 import miniprojet.model.*;
 
-public class CommandsExport {
+public class CommandsExport extends XMLHandler{
 	
-	/**
-	 * Le document XML où l'on va écrire l'export
-	 */
-	private Document document;
-	
-	/**
-	 * La racine de notre XML
-	 */
-	private Element root;
-	
-	/**
-	 * L'objet pour interagir avec la base de données
-	 */
-	private JDBC jdbc;
 	
 	public CommandsExport() {
-		document = new Document();
-		root = new Element("commandes");
-		jdbc = JDBC.getInstance();
+		super("commandes");
 	}
 	
 	/**
@@ -95,10 +79,10 @@ public class CommandsExport {
 	 * Exporter la liste des commandes au format XML
 	 */
 	public void export() {
-	    XMLOutputter sortie = new XMLOutputter(Format.getPrettyFormat());
+	    XMLOutputter output = new XMLOutputter(Format.getPrettyFormat());
 
 	    try (OutputStream out = new FileOutputStream("export_commandes.xml")) {
-	        sortie.output(document, out);
+	        output.output(document, out);
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
