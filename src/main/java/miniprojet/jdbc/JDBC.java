@@ -106,7 +106,7 @@ public class JDBC {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void insertClient(String email, String nom, String ville) {
 		if (email.length() > 60 || nom.length() > 30 || ville.length() > 30)
 			return;
@@ -152,7 +152,7 @@ public class JDBC {
 	public void insertCommand(String email) {
 		if (email.length() > 60)
 			return;
-		
+
 		if (!clientExists())
 			insertClient(email);
 

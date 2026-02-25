@@ -37,10 +37,14 @@ public class ProductsImport extends XMLHandler{
 	public void addProducts() {
 		List<Element> products = root.getChildren("produit");
 		
+		String name;
+		double price;
+		int quantity;
+		
 		for (Element product : products) {
-            String name = product.getChildText("nom");
-            double price = Double.parseDouble(product.getChildText("prix"));
-            int quantity = Integer.parseInt(product.getChildText("quantité"));
+            name = product.getChildText("nom");
+            price = Double.parseDouble(product.getChildText("prix"));
+            quantity = Integer.parseInt(product.getChildText("quantité"));
 
             jdbc.insertProduit(name, quantity, price);
         }
