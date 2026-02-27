@@ -17,8 +17,10 @@ public class CommandImport extends XMLHandler {
 
 	/**
 	 * Importer la commande depuis un fichier XML
+	 * @param path le chemin vers le fichier d'import
+	 * @return la résussite de l'import
 	 */
-	public void importCommand(String path) {
+	public boolean importCommand(String path) {
 		File file = new File(path);
 
 		SAXBuilder builder = new SAXBuilder();
@@ -29,9 +31,10 @@ public class CommandImport extends XMLHandler {
 			addClient();
 			addCommand();
 			addCommandLines();
-			//updateProducts();
+			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 

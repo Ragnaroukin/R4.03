@@ -96,8 +96,9 @@ public class CommandsExport extends XMLHandler{
 
 	/**
 	 * Exporter la liste des commandes au format XML
+	 * @return la réussite de l'export
 	 */
-	public void exportCommands() {
+	public boolean exportCommands() {
 		
 		ArrayList<Command> commands = jdbc.selectCommands();
 		
@@ -107,8 +108,10 @@ public class CommandsExport extends XMLHandler{
 
 	    try (OutputStream out = new FileOutputStream("export_commandes.xml")) {
 	        output.output(document, out);
+	        return true;
 	    } catch (Exception e) {
 	        e.printStackTrace();
+	        return false;
 	    }
 	}
 }
