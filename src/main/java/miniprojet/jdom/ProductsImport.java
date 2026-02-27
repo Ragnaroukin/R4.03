@@ -26,6 +26,8 @@ public class ProductsImport extends XMLHandler{
 	    try {
 	        document = builder.build(file);
 	        root = document.getRootElement();
+	        printProducts();
+	        addProducts();
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
@@ -34,7 +36,7 @@ public class ProductsImport extends XMLHandler{
 	/**
 	 * Ajouter les produits dans la base de données
 	 */
-	public void addProducts() {
+	private void addProducts() {
 		List<Element> products = root.getChildren("produit");
 		
 		String name;
@@ -53,7 +55,7 @@ public class ProductsImport extends XMLHandler{
 	/**
 	 * Afficher la liste des produits au format XML
 	 */
-	public void printProducts() {
+	private void printProducts() {
 		XMLOutputter output = new XMLOutputter(Format.getPrettyFormat());
 
 	    try {

@@ -304,6 +304,36 @@ public class JDBC {
 		}
 	}
 
+	/**
+	 * Ajoute une ligne à une commande. Diminue automatiquement le stock du produit.
+	 *
+	 * @param command  Identifiant de la commande
+	 * @param price    Prix auquel le produit est vendu
+	 * @param product  Identifiant du produit
+	 * @param quantity Quantité commandée
+	 */
+	public void insertLine(int command, double price, int product, int quantity) {
+		if (!commandExists(command) || !productExists(product))
+			return;
+		if (!verifyQuantity(product, quantity))
+			return;
+
+		boolean okStock = modifyQuantity(product, -quantity);
+		if (!okStock)
+			return;
+
+		String sql = "INSERT INTO LIGNE_COMMANDE(commande_id, id_produit, quantite, prix_vendu) VALUES (?,?,?,?)";
+		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, command);
+			ps.setInt(2, product);
+			ps.setInt(3, quantity);
+			ps.setDouble(4, price);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 	// -------------------------
 	// Modify methods
 	// -------------------------

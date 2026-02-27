@@ -2,14 +2,12 @@ package miniprojet.jdom;
 
 import java.io.File;
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-
-import miniprojet.model.Client;
 
 public class CommandImport extends XMLHandler {
 
@@ -31,7 +29,7 @@ public class CommandImport extends XMLHandler {
 			addClient();
 			addCommand();
 			addCommandLines();
-			updateProducts();
+			//updateProducts();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -57,44 +55,33 @@ public class CommandImport extends XMLHandler {
 		String email = root.getChild("client").getChildText("email");
 		String date = root.getChildText("date");
 
-		jdbc.insertCommand(email, Date.valueOf(date));
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+
+		try {
+			jdbc.insertCommand(email, new Date(sdf.parse(date).getTime()));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
 	 * Insérer les lignes de commandes associées aux produits commandés
 	 */
 	private void addCommandLines() {
-		List<Element> products = root.getChildren("produit");
+		List<Element> products = root.getChild("produits").getChildren("produit");
 
 		int commandId = jdbc.selectCommands().getLast().getId(); // la dernière commande ajoutée dans la base
 
 		int productId, quantity;
+		double price;
 
 		for (Element product : products) {
 
 			productId = jdbc.selectProduct(product.getChildText("nom")).getId();
 			quantity = Integer.parseInt(product.getChildText("quantité"));
+			price = Double.parseDouble(product.getChildText("prix"));
 
-			jdbc.insertLine(commandId, productId, quantity);
-		}
-	}
-
-	/**
-	 * Mettre à jour les quantités des produits commandés
-	 */
-	private void updateProducts() {
-		List<Element> products = root.getChildren("produit");
-
-		int commandId = jdbc.selectCommands().getLast().getId(); // la dernière commande ajoutée dans la base
-
-		int productId, quantity;
-
-		for (Element product : products) {
-
-			productId = jdbc.selectProduct(product.getChildText("nom")).getId();
-			quantity = Integer.parseInt(product.getChildText("quantité"));
-
-			jdbc.modifyQuantity(productId, quantity);
+			jdbc.insertLine(commandId, price, productId, quantity);
 		}
 	}
 }

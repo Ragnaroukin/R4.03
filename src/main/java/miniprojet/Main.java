@@ -11,11 +11,13 @@ public class Main {
 		CommandsExport commandsExport = new CommandsExport();
 		ProductsImport productsImport = new ProductsImport();
 		
-		productsImport.importProducts("produits.xml");
+		//productsImport.importProducts("produits.xml");
 		
-		/*commandImport.importCommand("commande.xml");
+		//commandImport.importCommand("commande1.xml");
+		//commandImport.importCommand("commande2.xml");
+		//commandImport.importCommand("commande3.xml");
 		
-		commandsExport.exportCommands();*/
+		commandsExport.exportCommands();
 
 	}
 }
