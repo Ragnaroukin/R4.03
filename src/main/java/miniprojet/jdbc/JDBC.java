@@ -231,24 +231,44 @@ public class JDBC {
 	/**
 	 * Crée une nouvelle commande pour un client. Si le client n'existe pas, il est
 	 * créé automatiquement.
+	 * 
+	 * La commande est enregistrée à la date courante.
 	 *
 	 * @param email Email du client
 	 */
 	public void insertCommand(String email) {
-		if (email == null || email.length() > 60)
-			return;
+	    if (email == null || email.length() > 60)
+	        return;
 
-		if (!clientExists(email)) {
-			insertClient(email);
-		}
+	    Date today = new Date(System.currentTimeMillis());
 
-		String sql = "INSERT INTO COMMANDES(email_client) VALUES (?)";
-		try (PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setString(1, email);
-			ps.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	    insertCommand(email, today);
+	}
+	
+	/**
+	 * Crée une nouvelle commande pour un client. Si le client n'existe pas, il est
+	 * créé automatiquement.
+	 * 
+	 * @param date Date d'enregistrement de la commande
+	 * @param email Email du client
+	 */
+	public void insertCommand(String email, Date date) {
+	    if (email == null || email.length() > 60 || date == null)
+	        return;
+
+	    if (!clientExists(email)) {
+	        insertClient(email);
+	    }
+
+	    String sql = "INSERT INTO COMMANDES(email_client, date) VALUES (?, ?)";
+
+	    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+	        ps.setString(1, email);
+	        ps.setDate(2, date);
+	        ps.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
 	}
 
 	/**
