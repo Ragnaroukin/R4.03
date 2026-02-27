@@ -72,7 +72,7 @@ public class CommandImport extends XMLHandler {
 
 		for (Element product : products) {
 
-			productId = jdbc.selectProduct(product.getChildText("nom"));
+			productId = jdbc.selectProduct(product.getChildText("nom")).getId();
 			quantity = Integer.parseInt(product.getChildText("quantité"));
 
 			jdbc.insertLine(commandId, productId, quantity);
@@ -91,7 +91,7 @@ public class CommandImport extends XMLHandler {
 
 		for (Element product : products) {
 
-			productId = jdbc.selectProduct(product.getChildText("nom"));
+			productId = jdbc.selectProduct(product.getChildText("nom")).getId();
 			quantity = Integer.parseInt(product.getChildText("quantité"));
 
 			jdbc.modifyQuantity(productId, quantity);

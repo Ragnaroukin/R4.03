@@ -46,7 +46,7 @@ public class ProductsImport extends XMLHandler{
             price = Double.parseDouble(product.getChildText("prix"));
             quantity = Integer.parseInt(product.getChildText("quantité"));
 
-            jdbc.insertProduit(name, quantity, price);
+            jdbc.insertProduct(name, quantity, price);
         }
 	}
 	
