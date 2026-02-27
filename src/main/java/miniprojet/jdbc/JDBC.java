@@ -389,21 +389,18 @@ public class JDBC {
 	 *
 	 * @return liste des produits
 	 */
-	public ArrayList<Product> selectProducts(String name) {
-		String sql = "SELECT * FROM PRODUITS where nom = ?";
-		ArrayList<Product> list = new ArrayList<>();
+	public Product selectProduct(String name) {
+		String sql = "SELECT * FROM PRODUITS WHERE nom = ?";
 
 		try (PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setString(1, name);
 
 			try (ResultSet res = ps.executeQuery()) {
-
-				while (res.next()) {
-					list.add(new Product(res.getInt("id"), res.getString("nom"), res.getDouble("prix"),
-							res.getInt("quantite")));
+				if (res.next()) {
+					return new  Product(res.getInt("id"), name, res.getDouble("prix"), res.getInt("quantite"));
 				}
+				return null;
 			}
-			return list;
 
 		} catch (SQLException e) {
 			e.printStackTrace();
