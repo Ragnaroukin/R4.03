@@ -15,10 +15,11 @@ public class ProductsImport extends XMLHandler{
 	}
 	
 	/**
-	 * Importer les produits et les stocker dans le document XML de la classe
-	 * @param file le fichier dont viennent les produits
+	 * Importer les produits depuis un fichier XML
+	 * @param path le chemin du fichier d'import
+	 * @return la réussite de l'import
 	 */
-	public void importProducts(String path) {
+	public boolean importProducts(String path) {
 		File file = new File(path);
 		
 		SAXBuilder builder = new SAXBuilder();
@@ -28,8 +29,10 @@ public class ProductsImport extends XMLHandler{
 	        root = document.getRootElement();
 	        printProducts();
 	        addProducts();
+	        return true;
 	    } catch (Exception e) {
 	        e.printStackTrace();
+	        return false;
 	    }
 	}
 	
