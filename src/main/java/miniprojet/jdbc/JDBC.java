@@ -29,9 +29,8 @@ public class JDBC {
 	private static JDBC instance;
 
 	/**
-	 * Constructeur privé.
-	 * Initialise les paramètres de connexion et ouvre la connexion
-	 * à la base de données.
+	 * Constructeur privé. Initialise les paramètres de connexion et ouvre la
+	 * connexion à la base de données.
 	 */
 	private JDBC() {
 		host = "localhost";
@@ -129,7 +128,7 @@ public class JDBC {
 	/**
 	 * Vérifie si la quantité demandée est disponible en stock.
 	 *
-	 * @param idProduct Identifiant du produit
+	 * @param idProduct      Identifiant du produit
 	 * @param quantityWanted Quantité demandée
 	 * @return true si le stock est suffisant, false sinon
 	 */
@@ -237,38 +236,38 @@ public class JDBC {
 	 * @param email Email du client
 	 */
 	public void insertCommand(String email) {
-	    if (email == null || email.length() > 60)
-	        return;
+		if (email == null || email.length() > 60)
+			return;
 
-	    Date today = new Date(System.currentTimeMillis());
+		Date today = new Date(System.currentTimeMillis());
 
-	    insertCommand(email, today);
+		insertCommand(email, today);
 	}
-	
+
 	/**
 	 * Crée une nouvelle commande pour un client. Si le client n'existe pas, il est
 	 * créé automatiquement.
 	 * 
-	 * @param date Date d'enregistrement de la commande
+	 * @param date  Date d'enregistrement de la commande
 	 * @param email Email du client
 	 */
 	public void insertCommand(String email, Date date) {
-	    if (email == null || email.length() > 60 || date == null)
-	        return;
+		if (email == null || email.length() > 60 || date == null)
+			return;
 
-	    if (!clientExists(email)) {
-	        insertClient(email);
-	    }
+		if (!clientExists(email)) {
+			insertClient(email);
+		}
 
-	    String sql = "INSERT INTO COMMANDES(email_client, date) VALUES (?, ?)";
+		String sql = "INSERT INTO COMMANDES(email_client, date) VALUES (?, ?)";
 
-	    try (PreparedStatement ps = conn.prepareStatement(sql)) {
-	        ps.setString(1, email);
-	        ps.setDate(2, date);
-	        ps.executeUpdate();
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
+		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, email);
+			ps.setDate(2, date);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -374,6 +373,35 @@ public class JDBC {
 			while (res.next()) {
 				list.add(new Product(res.getInt("id"), res.getString("nom"), res.getDouble("prix"),
 						res.getInt("quantite")));
+			}
+			return list;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+	 * Récupère tous les produits.
+	 *
+	 * @param name Nom du produit.
+	 *
+	 * @return liste des produits
+	 */
+	public ArrayList<Product> selectProducts(String name) {
+		String sql = "SELECT * FROM PRODUITS where nom = ?";
+		ArrayList<Product> list = new ArrayList<>();
+
+		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, name);
+
+			try (ResultSet res = ps.executeQuery()) {
+
+				while (res.next()) {
+					list.add(new Product(res.getInt("id"), res.getString("nom"), res.getDouble("prix"),
+							res.getInt("quantite")));
+				}
 			}
 			return list;
 
