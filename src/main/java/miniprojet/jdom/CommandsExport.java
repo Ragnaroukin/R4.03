@@ -32,6 +32,8 @@ public class CommandsExport extends XMLHandler{
 		Element dateElement = new Element("date");
 		Element totalElement = new Element("total");
 		
+		commandElement.setAttribute("id", "C"+id);
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 		
 		dateElement.addContent(sdf.format(command.getDate()));
@@ -39,9 +41,7 @@ public class CommandsExport extends XMLHandler{
 		
 		exportClient(command, commandElement);
 		exportProducts(id, commandElement);
-		
-		commandElement.setAttribute("id", "C"+id);
-		
+
 		root.addContent(commandElement);
 	}
 	
