@@ -18,6 +18,7 @@ public class Main {
 		//commandImport.importCommand("commande3.xml");
 		
 		commandsExport.exportCommands();
+		
 
 	}
 }

@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
 public class CommandImport extends XMLHandler {
@@ -17,6 +18,7 @@ public class CommandImport extends XMLHandler {
 
 	/**
 	 * Importer la commande depuis un fichier XML
+	 * 
 	 * @param path le chemin vers le fichier d'import
 	 * @return la résussite de l'import
 	 */
@@ -24,6 +26,7 @@ public class CommandImport extends XMLHandler {
 		File file = new File(path);
 
 		SAXBuilder builder = new SAXBuilder();
+		builder.setFeature("http://xml.org/sax/features/validation", true);
 
 		try {
 			document = builder.build(file);
