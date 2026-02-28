@@ -18,12 +18,13 @@ public class CommandImport extends XMLHandler {
 	/**
 	 * Importer la commande depuis un fichier XML
 	 * @param path le chemin vers le fichier d'import
-	 * @return la résussite de l'import
+	 * @return la réussite de l'import
 	 */
 	public boolean importCommand(String path) {
 		File file = new File(path);
 
 		SAXBuilder builder = new SAXBuilder();
+		builder.setFeature("http://xml.org/sax/features/validation", true);
 
 		try {
 			document = builder.build(file);
